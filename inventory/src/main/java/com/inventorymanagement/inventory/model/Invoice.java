@@ -17,13 +17,16 @@ public class Invoice {
 
     @Column(nullable = false)
     private LocalDate invoiceDate;
+    @Column(nullable = false)
+    private LocalDate dueDate;
+
 
     @ManyToOne
     @JoinColumn(name = "company_id", nullable = false)
     private Company company;
 
     @Column(nullable = false)
-    private Double totalAmount;
+    private Double totalAmount = 0.0;
 
     @Column(nullable = false)
     private Double paidAmount = 0.0;

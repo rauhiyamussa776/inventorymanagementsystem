@@ -41,11 +41,22 @@ public class InvoiceItemService {
         invoiceItem.setInvoice(invoice);
         invoiceItem.setItem(item);
 
+        // Calculate total price of this item
         double totalPrice =
                 invoiceItem.getQuantity() * invoiceItem.getUnitPrice();
 
         invoiceItem.setTotalAmount(totalPrice);
 
+        // Add this item's total to the invoice total
+        double newInvoiceTotal =
+                invoice.getTotalAmount() + totalPrice;
+
+        invoice.setTotalAmount(newInvoiceTotal);
+
+        // Save invoice with updated total
+        invoiceRepository.save(invoice);
+
+        // Save invoice item
         return invoiceItemRepository.save(invoiceItem);
     }
 

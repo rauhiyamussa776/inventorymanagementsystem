@@ -1,5 +1,6 @@
 package com.inventorymanagement.inventory.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import jakarta.persistence.*;
 
@@ -23,8 +24,8 @@ public class StockMovement {
     @Column(nullable = false)
     private MovementType type;
 
-    @Column(nullable = false)
-    private Double quantity;
+   @Column(nullable = false, precision = 12, scale = 2)
+private BigDecimal quantity;
 
     @Column(nullable = false)
     private LocalDateTime movementDate;
