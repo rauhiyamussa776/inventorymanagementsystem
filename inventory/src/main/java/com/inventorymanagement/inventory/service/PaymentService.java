@@ -6,6 +6,7 @@ import com.inventorymanagement.inventory.model.Payment;
 import com.inventorymanagement.inventory.repository.InvoiceRepository;
 import com.inventorymanagement.inventory.repository.PaymentRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,6 +25,7 @@ public class PaymentService {
         this.invoiceRepository = invoiceRepository;
     }
 
+    @Transactional
     public Payment insertPayment(Payment payment) {
 
         // Get invoice ID
@@ -35,26 +37,34 @@ public class PaymentService {
 
         payment.setInvoice(invoice);
 
+        // Validate payment amount
+        if (payment.getAmount() == null || payment.getAmount() <= 0) {
+            throw new RuntimeException(
+                    "Payment amount must be greater than zero"
+            );
+        }
+
         // Set payment date automatically if not provided
         if (payment.getPaymentDate() == null) {
             payment.setPaymentDate(LocalDateTime.now());
         }
 
         // Calculate new paid amount
-        Double newPaidAmount = invoice.getPaidAmount() + payment.getAmount();
+        Double newPaidAmount =
+                invoice.getPaidAmount() + payment.getAmount();
 
-        // Prevent payment greater than invoice total
+        // Prevent payment greater than invoice balance
         if (newPaidAmount > invoice.getTotalAmount()) {
             throw new RuntimeException(
                     "Payment amount exceeds the invoice balance"
             );
         }
 
-        // Update paid amount
+        // Update invoice paid amount
         invoice.setPaidAmount(newPaidAmount);
 
         // Update invoice status
-        if (newPaidAmount == 0) {
+        if (Double.compare(newPaidAmount, 0.0) == 0) {
 
             invoice.setStatus(InvoiceStatus.UNPAID);
 
@@ -80,6 +90,7 @@ public class PaymentService {
 
     public Payment getPaymentById(Long id) {
         return paymentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Payment not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("Payment not found"));
     }
 }

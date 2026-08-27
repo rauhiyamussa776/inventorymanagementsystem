@@ -39,12 +39,26 @@ public class StockMovementService {
     @Transactional
     public StockMovement insertStockMovement(StockMovement stockMovement) {
 
+        // Check item
+        if (stockMovement.getItem() == null ||
+                stockMovement.getItem().getId() == null) {
+
+            throw new RuntimeException("Item is required");
+        }
+
+        // Check movement type
+        if (stockMovement.getType() == null) {
+
+            throw new RuntimeException("Movement type is required");
+        }
+
         // Get item ID
         Long itemId = stockMovement.getItem().getId();
 
         // Check if item exists
         Items item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new RuntimeException("Item not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("Item not found"));
 
         stockMovement.setItem(item);
 
@@ -55,9 +69,12 @@ public class StockMovementService {
 
         // Validate quantity
         if (stockMovement.getQuantity() == null ||
-                stockMovement.getQuantity().compareTo(BigDecimal.ZERO) <= 0) {
+                stockMovement.getQuantity()
+                        .compareTo(BigDecimal.ZERO) <= 0) {
 
-            throw new RuntimeException("Quantity must be greater than zero");
+            throw new RuntimeException(
+                    "Quantity must be greater than zero"
+            );
         }
 
         // Save movement first
@@ -85,7 +102,13 @@ public class StockMovementService {
 
             // Check if enough stock exists
             if (totalAvailable.compareTo(quantityToRemove) < 0) {
-                throw new RuntimeException("Insufficient stock");
+
+                throw new RuntimeException(
+                        "Insufficient stock. Available stock: "
+                                + totalAvailable
+                                + ", requested quantity: "
+                                + quantityToRemove
+                );
             }
 
             BigDecimal remainingToRemove = quantityToRemove;
@@ -93,7 +116,9 @@ public class StockMovementService {
             // FIFO
             for (StockBatch batch : batches) {
 
-                if (remainingToRemove.compareTo(BigDecimal.ZERO) <= 0) {
+                if (remainingToRemove
+                        .compareTo(BigDecimal.ZERO) <= 0) {
+
                     break;
                 }
 
@@ -103,26 +128,34 @@ public class StockMovementService {
                 BigDecimal quantityTaken;
 
                 // Use the whole batch
-                if (batchRemaining.compareTo(remainingToRemove) <= 0) {
+                if (batchRemaining
+                        .compareTo(remainingToRemove) <= 0) {
 
                     quantityTaken = batchRemaining;
 
-                    batch.setQuantityRemaining(BigDecimal.ZERO);
+                    batch.setQuantityRemaining(
+                            BigDecimal.ZERO
+                    );
 
                     remainingToRemove =
-                            remainingToRemove.subtract(quantityTaken);
-
+                            remainingToRemove.subtract(
+                                    quantityTaken
+                            );
                 }
+
                 // Use only part of the batch
                 else {
 
                     quantityTaken = remainingToRemove;
 
                     batch.setQuantityRemaining(
-                            batchRemaining.subtract(quantityTaken)
+                            batchRemaining.subtract(
+                                    quantityTaken
+                            )
                     );
 
-                    remainingToRemove = BigDecimal.ZERO;
+                    remainingToRemove =
+                            BigDecimal.ZERO;
                 }
 
                 // Save updated batch
@@ -136,7 +169,9 @@ public class StockMovementService {
                 movementBatch.setStockBatch(batch);
                 movementBatch.setQuantity(quantityTaken);
 
-                stockMovementBatchRepository.save(movementBatch);
+                stockMovementBatchRepository.save(
+                        movementBatch
+                );
             }
         }
 
@@ -148,8 +183,11 @@ public class StockMovementService {
     }
 
     public StockMovement getStockMovementById(Long id) {
+
         return stockMovementRepository.findById(id)
                 .orElseThrow(() ->
-                        new RuntimeException("Stock movement not found"));
+                        new RuntimeException(
+                                "Stock movement not found"
+                        ));
     }
 }

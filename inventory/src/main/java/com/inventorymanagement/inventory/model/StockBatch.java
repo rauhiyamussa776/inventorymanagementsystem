@@ -29,6 +29,6 @@ public class StockBatch {
     @Column(nullable = false)
     private LocalDate receivedDate;
 
-    @Column(nullable = false)
+  
     private LocalDate expiryDate;
 }
