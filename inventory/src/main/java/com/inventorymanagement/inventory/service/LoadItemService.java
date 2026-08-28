@@ -3,6 +3,8 @@ package com.inventorymanagement.inventory.service;
 import com.inventorymanagement.inventory.model.Items;
 import com.inventorymanagement.inventory.model.Load;
 import com.inventorymanagement.inventory.model.LoadItem;
+import com.inventorymanagement.inventory.model.LoadStatus;
+import com.inventorymanagement.inventory.model.StockBatch;
 import com.inventorymanagement.inventory.repository.ItemRepository;
 import com.inventorymanagement.inventory.repository.LoadItemRepository;
 import com.inventorymanagement.inventory.repository.LoadRepository;
@@ -34,23 +36,66 @@ public class LoadItemService {
 
     public LoadItem insertLoadItem(LoadItem loadItem) {
 
+        // Check Load
+        if (loadItem.getLoad() == null ||
+                loadItem.getLoad().getId() == null) {
+
+            throw new RuntimeException("Load is required");
+        }
+
+        // Check Item
+        if (loadItem.getItem() == null ||
+                loadItem.getItem().getId() == null) {
+
+            throw new RuntimeException("Item is required");
+        }
+
         Long loadId = loadItem.getLoad().getId();
         Long itemId = loadItem.getItem().getId();
 
+        // Find Load
         Load load = loadRepository.findById(loadId)
-                .orElseThrow(() -> new RuntimeException("Load not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("Load not found"));
 
+        // Find Item
         Items item = itemRepository.findById(itemId)
-                .orElseThrow(() -> new RuntimeException("Item not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("Item not found"));
 
+        // Load must still be PENDING
+        if (load.getStatus() != LoadStatus.PENDING) {
+
+            throw new RuntimeException(
+                    "Cannot add items to a load that is not PENDING"
+            );
+        }
+
+        // Validate quantity
         if (loadItem.getQuantity() == null ||
                 loadItem.getQuantity().compareTo(BigDecimal.ZERO) <= 0) {
 
-            throw new RuntimeException("Quantity must be greater than zero");
+            throw new RuntimeException(
+                    "Quantity must be greater than zero"
+            );
         }
 
-        // Get all available stock for this item
-        List<com.inventorymanagement.inventory.model.StockBatch> batches =
+        // Check duplicate item in the same Load
+        List<LoadItem> existingItems =
+                loadItemRepository.findByLoad(load);
+
+        for (LoadItem existingItem : existingItems) {
+
+            if (existingItem.getItem().getId().equals(item.getId())) {
+
+                throw new RuntimeException(
+                        "Item already exists in this load"
+                );
+            }
+        }
+
+        // Get available stock
+        List<StockBatch> batches =
                 stockBatchRepository
                         .findByItemAndQuantityRemainingGreaterThanOrderByReceivedDateAsc(
                                 item,
@@ -59,11 +104,12 @@ public class LoadItemService {
 
         // Calculate total available stock
         BigDecimal availableStock = batches.stream()
-                .map(com.inventorymanagement.inventory.model.StockBatch::getQuantityRemaining)
+                .map(StockBatch::getQuantityRemaining)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // Check if requested quantity is available
+        // Check stock
         if (availableStock.compareTo(loadItem.getQuantity()) < 0) {
+
             throw new RuntimeException(
                     "Insufficient stock. Available stock: "
                             + availableStock
@@ -83,6 +129,7 @@ public class LoadItemService {
     }
 
     public LoadItem getLoadItemById(Long id) {
+
         return loadItemRepository.findById(id)
                 .orElseThrow(() ->
                         new RuntimeException("Load item not found"));

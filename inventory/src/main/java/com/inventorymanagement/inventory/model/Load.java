@@ -21,6 +21,10 @@ public class Load {
     @JoinColumn(name = "company_id", nullable = false)
     private Company company;
 
+    @ManyToOne
+    @JoinColumn(name = "invoice_id")
+    private Invoice invoice;
+
     @Column(nullable = false)
     private LocalDateTime createdDate;
 

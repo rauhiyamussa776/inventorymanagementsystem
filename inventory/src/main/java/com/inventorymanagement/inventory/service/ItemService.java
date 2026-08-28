@@ -1,3 +1,4 @@
+
 package com.inventorymanagement.inventory.service;
 
 import com.inventorymanagement.inventory.model.Items;
@@ -16,6 +17,14 @@ public class ItemService {
     }
 
     public Items insertItem(Items item) {
+
+        // Check item name
+        if (item.getItemsNames() == null ||
+                item.getItemsNames().trim().isEmpty()) {
+
+            throw new RuntimeException("Item name is required");
+        }
+
         return itemRepository.save(item);
     }
 
@@ -24,14 +33,19 @@ public class ItemService {
     }
 
     public Items getItemById(Long id) {
+
         return itemRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Item not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("Item not found"));
     }
+
     public void deleteItem(Long id) {
 
-    Items item = itemRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Item not found"));
+        Items item = itemRepository.findById(id)
+                .orElseThrow(() ->
+                        new RuntimeException("Item not found"));
 
-    itemRepository.delete(item);
+        itemRepository.delete(item);
+    }
 }
-}
+

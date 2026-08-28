@@ -1,3 +1,4 @@
+
 package com.inventorymanagement.inventory.service;
 
 import com.inventorymanagement.inventory.model.Company;
@@ -33,6 +34,7 @@ public class InvoiceService {
             throw new RuntimeException("Company is required");
         }
 
+        // Find company
         Long companyId = invoice.getCompany().getId();
 
         Company company = companyRepository.findById(companyId)
@@ -41,42 +43,62 @@ public class InvoiceService {
 
         invoice.setCompany(company);
 
-        // Validate invoice number
+        // Check invoice number
         if (invoice.getInvoiceNumber() == null ||
                 invoice.getInvoiceNumber().trim().isEmpty()) {
 
-            throw new RuntimeException("Invoice number is required");
+            throw new RuntimeException(
+                    "Invoice number is required"
+            );
         }
 
-        // Validate invoice date
+        // Check invoice date
         if (invoice.getInvoiceDate() == null) {
-            throw new RuntimeException("Invoice date is required");
+
+            invoice.setInvoiceDate(LocalDate.now());
         }
 
-        // Validate due date
+        // Check due date
         if (invoice.getDueDate() == null) {
-            throw new RuntimeException("Due date is required");
+
+            throw new RuntimeException(
+                    "Due date is required"
+            );
         }
 
-        if (invoice.getDueDate().isBefore(invoice.getInvoiceDate())) {
+        // Due date cannot be before invoice date
+        if (invoice.getDueDate()
+                .isBefore(invoice.getInvoiceDate())) {
+
             throw new RuntimeException(
                     "Due date cannot be before invoice date"
             );
         }
 
-        // New invoice starts with zero
-        invoice.setTotalAmount(0.0);
-        invoice.setPaidAmount(0.0);
+        // Set default values
+        if (invoice.getTotalAmount() == null) {
+
+            invoice.setTotalAmount(0.0);
+        }
+
+        if (invoice.getPaidAmount() == null) {
+
+            invoice.setPaidAmount(0.0);
+        }
+
+        // New invoice starts as UNPAID
         invoice.setStatus(InvoiceStatus.UNPAID);
 
         return invoiceRepository.save(invoice);
     }
 
     public List<Invoice> getAllInvoices() {
+
         return invoiceRepository.findAll();
     }
 
     public Invoice getInvoiceById(Long id) {
+
         return invoiceRepository.findById(id)
                 .orElseThrow(() ->
                         new RuntimeException("Invoice not found"));

@@ -28,24 +28,43 @@ public class PaymentService {
     @Transactional
     public Payment insertPayment(Payment payment) {
 
+        // Check invoice
+        if (payment.getInvoice() == null ||
+                payment.getInvoice().getId() == null) {
+
+            throw new RuntimeException("Invoice is required");
+        }
+
         // Get invoice ID
         Long invoiceId = payment.getInvoice().getId();
 
         // Check if invoice exists
         Invoice invoice = invoiceRepository.findById(invoiceId)
-                .orElseThrow(() -> new RuntimeException("Invoice not found"));
+                .orElseThrow(() ->
+                        new RuntimeException("Invoice not found"));
 
         payment.setInvoice(invoice);
 
+        // Prevent payment on an already paid invoice
+        if (invoice.getStatus() == InvoiceStatus.PAID) {
+
+            throw new RuntimeException(
+                    "Cannot make payment. Invoice is already PAID"
+            );
+        }
+
         // Validate payment amount
-        if (payment.getAmount() == null || payment.getAmount() <= 0) {
+        if (payment.getAmount() == null ||
+                payment.getAmount() <= 0) {
+
             throw new RuntimeException(
                     "Payment amount must be greater than zero"
             );
         }
 
-        // Set payment date automatically if not provided
+        // Set payment date automatically
         if (payment.getPaymentDate() == null) {
+
             payment.setPaymentDate(LocalDateTime.now());
         }
 
@@ -55,6 +74,7 @@ public class PaymentService {
 
         // Prevent payment greater than invoice balance
         if (newPaidAmount > invoice.getTotalAmount()) {
+
             throw new RuntimeException(
                     "Payment amount exceeds the invoice balance"
             );
@@ -85,12 +105,15 @@ public class PaymentService {
     }
 
     public List<Payment> getAllPayments() {
+
         return paymentRepository.findAll();
     }
 
     public Payment getPaymentById(Long id) {
+
         return paymentRepository.findById(id)
                 .orElseThrow(() ->
                         new RuntimeException("Payment not found"));
     }
+
 }
