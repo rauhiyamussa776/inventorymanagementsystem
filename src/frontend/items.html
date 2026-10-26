@@ -1,0 +1,144 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAHAN SUPPLIES | Items</title>
+
+    <link rel="stylesheet" href="style.css">
+    
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+<body class="dashboard-body">
+
+    <!-- Shared sidebar and navbar -->
+    <div id="app"></div>
+
+    <!-- Items page HTML -->
+    <template id="itemsPageTemplate">
+        <div class="items-page">
+
+            <div class="items-heading">
+                <div>
+                    <h1>Items / Products</h1>
+                    <p>Manage the items sold by RAHAN SUPPLIES.</p>
+                </div>
+
+                <button type="button" class="items-primary-btn" id="addItemBtn">
+                    <i class="fa-solid fa-plus"></i>
+                    Add Item
+                </button>
+            </div>
+
+            <div class="items-stats">
+                <div class="items-stat-card">
+                    <span class="items-stat-icon">
+                        <i class="fa-solid fa-boxes-stacked"></i>
+                    </span>
+                    <div>
+                        <p>Total Registered Items</p>
+                        <h2 id="totalItems">0</h2>
+                    </div>
+                </div>
+            </div>
+
+            <section class="items-card">
+                <div class="items-toolbar">
+                    <div>
+                        <h3>Registered Items</h3>
+                        <p>Item codes, categories, units and selling prices.</p>
+                    </div>
+
+                    <div class="items-search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="search" id="itemSearch"
+                               placeholder="Search items..."
+                               aria-label="Search items">
+                    </div>
+                </div>
+
+                <div class="table-wrapper">
+                    <table class="items-table">
+                        <thead>
+                            <tr>
+                                <th>Item Code</th>
+                                <th>Item Name</th>                             
+                                <th>Unit</th>
+                                <th>Selling Price</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="itemsTableBody"></tbody>
+                    </table>
+                </div>
+
+                <p class="items-note">
+                    <i class="fa-solid fa-circle-info"></i>
+                    Stock quantities will be managed separately in Stock Batches
+                    and Stock Movements.
+                </p>
+            </section>
+
+        </div>
+
+        <!-- Add/Edit Item Modal -->
+        <div class="items-modal" id="itemModal">
+            <div class="items-modal-card">
+
+                <div class="items-modal-heading">
+                    <div>
+                        <h2 id="itemModalTitle">Add Item</h2>
+                        <p>Enter the item information below.</p>
+                    </div>
+
+                    <button type="button" id="closeItemModal"
+                            class="items-close-btn" aria-label="Close">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+
+                <form id="itemForm">
+                    <label for="itemName">Item Name</label>
+                    <input id="itemName" type="text"
+                           placeholder="e.g. Mchele" required maxlength="100">
+
+                    <label for="itemCode">Item Code</label>
+                    <input id="itemCode" type="text"
+                           placeholder="e.g. ITM-004" required maxlength="30">
+
+                    
+
+                    <label for="itemUnit">Unit of Measurement</label>
+                    <select id="itemUnit" required>
+                        <option value="kg">Kilogram (kg)</option>
+                       
+                    </select>
+
+                    <label for="itemPrice">Selling Price (TZS per unit)</label>
+                    <input id="itemPrice" type="number"
+                           min="0" step="0.01"
+                           placeholder="e.g. 3500" required>
+
+                    <p id="itemFormMessage" class="items-form-message"></p>
+
+                    <div class="items-form-actions">
+                        <button type="button" id="cancelItemBtn"
+                                class="items-cancel-btn">Cancel</button>
+
+                        <button type="submit" class="items-primary-btn">
+                            <i class="fa-solid fa-floppy-disk"></i>
+                            Save Item
+                        </button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </template>
+
+    <script src="jscript/layout.js"></script>
+    <script src="jscript/items.js"></script>
+</body>
+</html>

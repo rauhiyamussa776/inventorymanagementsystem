@@ -1,0 +1,276 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Stock Batches | RAHAN SUPPLIES</title>
+
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="stock-batches.css">
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+    >
+</head>
+
+<body class="dashboard-body">
+
+    <div id="app"></div>
+
+    <template id="stockBatchesPageTemplate">
+
+        <div class="stock-batches-page">
+
+            <div class="stock-batches-heading">
+                <div>
+                    <h2>Stock Batches</h2>
+                    <p>
+                        Manage received stock batches and monitor
+                        remaining quantities and expiry dates.
+                    </p>
+                </div>
+
+                <button
+                    type="button"
+                    class="stock-batches-primary-btn"
+                    id="addStockBatchBtn"
+                >
+                    <i class="fa-solid fa-plus"></i>
+                    Add Stock Batch
+                </button>
+            </div>
+
+            <div class="stock-batches-summary">
+                <div class="stock-batches-summary-card">
+                    <div class="stock-batches-summary-icon">
+                        <i class="fa-solid fa-boxes-stacked"></i>
+                    </div>
+
+                    <div>
+                        <p>Total Batches</p>
+                        <h3 id="totalBatches">0</h3>
+                    </div>
+                </div>
+
+                <div class="stock-batches-summary-card">
+                    <div class="stock-batches-summary-icon expiry-icon">
+                        <i class="fa-solid fa-calendar-xmark"></i>
+                    </div>
+
+                    <div>
+                        <p>Expired Batches</p>
+                        <h3 id="expiredBatches">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stock-batches-card">
+
+                <div class="stock-batches-toolbar">
+                    <div>
+                        <h3>Batch Records</h3>
+                        <p>View stock batches recorded in the system.</p>
+                    </div>
+
+                    <div class="stock-batches-search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+
+                        <input
+                            type="search"
+                            id="stockBatchSearch"
+                            placeholder="Search batch or item..."
+                            aria-label="Search stock batches"
+                        >
+                    </div>
+                </div>
+
+                <div class="stock-batches-table-wrapper">
+                    <table class="stock-batches-table">
+
+                        <thead>
+                            <tr>
+                                <th>Batch Number</th>
+                                <th>Item</th>
+                                <th>Quantity Received</th>
+                                <th>Quantity Remaining</th>
+                                <th>Received Date</th>
+                                <th>Expiry Date</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="stockBatchesTableBody">
+                            <tr>
+                                <td colspan="7">
+                                    Loading stock batches...
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+                </div>
+
+                <p class="stock-batches-note">
+                    Quantity remaining is managed by the backend.
+                    Stock batches are displayed using the available API.
+                </p>
+
+            </div>
+
+            <!-- Add Stock Batch Modal -->
+
+            <div
+                class="stock-batches-modal"
+                id="stockBatchModal"
+                aria-hidden="true"
+            >
+
+                <div
+                    class="stock-batches-modal-card"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="stockBatchModalTitle"
+                >
+
+                    <div class="stock-batches-modal-heading">
+                        <div>
+                            <h3 id="stockBatchModalTitle">
+                                Add Stock Batch
+                            </h3>
+
+                            <p>
+                                Enter the details of the received stock.
+                            </p>
+                        </div>
+
+                        <button
+                            type="button"
+                            id="closeStockBatchModal"
+                            class="stock-batches-close-btn"
+                            aria-label="Close dialog"
+                        >
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <form id="stockBatchForm">
+
+                        <div class="stock-batches-form-group">
+                            <label for="batchNumber">
+                                Batch Number
+                            </label>
+
+                            <input
+                                type="text"
+                                id="batchNumber"
+                                name="batchNumber"
+                                placeholder="e.g. BAT-001"
+                                required
+                            >
+                        </div>
+
+                        <div class="stock-batches-form-group">
+                            <label for="batchItem">
+                                Item
+                            </label>
+
+                            <select
+                                id="batchItem"
+                                name="item"
+                                required
+                            >
+                                <option value="">
+                                    Select an item
+                                </option>
+                            </select>
+                        </div>
+
+                        <div class="stock-batches-form-group">
+                            <label for="quantityReceived">
+                                Quantity Received
+                            </label>
+
+                            <input
+                                type="number"
+                                id="quantityReceived"
+                                name="quantityReceived"
+                                min="0.01"
+                                step="0.01"
+                                placeholder="Enter quantity"
+                                required
+                            >
+                        </div>
+
+                        <div class="stock-batches-form-group">
+                            <label for="receivedDate">
+                                Received Date
+                            </label>
+
+                            <input
+                                type="date"
+                                id="receivedDate"
+                                name="receivedDate"
+                            >
+
+                            <small>
+                                Leave empty to use today's date.
+                            </small>
+                        </div>
+
+                        <div class="stock-batches-form-group">
+                            <label for="expiryDate">
+                                Expiry Date
+                            </label>
+
+                            <input
+                                type="date"
+                                id="expiryDate"
+                                name="expiryDate"
+                                required
+                            >
+                        </div>
+
+                        <div
+                            class="stock-batches-message"
+                            id="stockBatchMessage"
+                            role="alert"
+                        ></div>
+
+                        <div class="stock-batches-form-actions">
+
+                            <button
+                                type="button"
+                                id="cancelStockBatch"
+                                class="stock-batches-cancel-btn"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                type="submit"
+                                id="saveStockBatchBtn"
+                                class="stock-batches-primary-btn"
+                            >
+                                Save Batch
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </template>
+
+    <script src="jscript/layout.js"></script>
+    <script src="jscript/stock-batches.js"></script>
+
+</body>
+</html>
