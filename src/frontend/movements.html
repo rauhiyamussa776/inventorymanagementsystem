@@ -1,0 +1,180 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Movements | RAHAN SUPPLIES</title>
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+    <div id="app"></div>
+
+    <template id="stockMovementsPageTemplate">
+        <section class="movements-page">
+
+            <div class="movements-header">
+                <div>
+                    <h1>Stock Movements</h1>
+                    <p>Track items entering and leaving your stock.</p>
+                </div>
+
+                <button type="button" class="movement-primary-btn"
+                        id="addMovementBtn">
+                    <i class="fa-solid fa-plus"></i>
+                    Record Movement
+                </button>
+            </div>
+
+            <div class="movement-summary">
+                <div class="movement-summary-card">
+                    <div class="movement-summary-icon total-icon">
+                        <i class="fa-solid fa-arrows-rotate"></i>
+                    </div>
+                    <div>
+                        <p>Total Movements</p>
+                        <h2 id="totalMovements">0</h2>
+                    </div>
+                </div>
+
+                <div class="movement-summary-card">
+                    <div class="movement-summary-icon in-icon">
+                        <i class="fa-solid fa-arrow-down"></i>
+                    </div>
+                    <div>
+                        <p>Stock In</p>
+                        <h2 id="stockInTotal">0</h2>
+                    </div>
+                </div>
+
+                <div class="movement-summary-card">
+                    <div class="movement-summary-icon out-icon">
+                        <i class="fa-solid fa-arrow-up"></i>
+                    </div>
+                    <div>
+                        <p>Stock Out</p>
+                        <h2 id="stockOutTotal">0</h2>
+                    </div>
+                </div>
+            </div>
+
+            <div class="movement-content-card">
+                <div class="movement-toolbar">
+                    <div class="movement-search">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="search" id="movementSearch"
+                               placeholder="Search item or invoice...">
+                    </div>
+
+                    <select id="movementTypeFilter"
+                            aria-label="Filter movements">
+                        <option value="ALL">All Movements</option>
+                        <option value="IN">Stock In</option>
+                        <option value="OUT">Stock Out</option>
+                    </select>
+                </div>
+
+                <div class="movement-table-wrapper">
+                    <table class="movement-table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Movement Type</th>
+                                <th>Quantity</th>
+                                <th>Movement Date</th>
+                                <th>Invoice</th>
+                            </tr>
+                        </thead>
+                        <tbody id="movementsTableBody">
+                            <tr>
+                                <td colspan="5">Loading movements...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <p class="movement-table-note">
+                    <i class="fa-solid fa-circle-info"></i>
+                    Demo data only. Stock changes are not applied to real inventory.
+                </p>
+            </div>
+
+            <!-- Record Movement Modal -->
+            <div class="movement-modal" id="movementModal">
+                <div class="movement-modal-content">
+                    <div class="movement-modal-header">
+                        <div>
+                            <h2>Record Stock Movement</h2>
+                            <p>Enter the movement details below.</p>
+                        </div>
+
+                        <button type="button" id="closeMovementModal"
+                                class="movement-close-btn"
+                                aria-label="Close form">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <form id="movementForm">
+                        <div class="movement-form-group">
+                            <label for="movementItem">Item</label>
+                            <select id="movementItem" required>
+                                <option value="">Select item</option>
+                            </select>
+                        </div>
+
+                        <div class="movement-form-group">
+                            <label for="movementType">Movement Type</label>
+                            <select id="movementType" required>
+                                <option value="">Select movement type</option>
+                                <option value="IN">Stock In</option>
+                                <option value="OUT">Stock Out</option>
+                            </select>
+                        </div>
+
+                        <div class="movement-form-group">
+                            <label for="movementQuantity">Quantity</label>
+                            <input type="number" id="movementQuantity"
+                                   min="0.01" step="0.01"
+                                   placeholder="Enter quantity" required>
+                        </div>
+
+                        <div class="movement-form-group">
+                            <label for="movementDate">Movement Date and Time</label>
+                            <input type="datetime-local" id="movementDate" required>
+                        </div>
+
+                        <div class="movement-form-group">
+                            <label for="movementInvoice">Invoice (Optional)</label>
+                            <select id="movementInvoice">
+                                <option value="">No invoice</option>
+                            </select>
+                        </div>
+
+                        <div id="movementMessage" class="movement-message"></div>
+
+                        <div class="movement-form-actions">
+                            <button type="button" id="cancelMovementBtn"
+                                    class="movement-cancel-btn">
+                                Cancel
+                            </button>
+
+                            <button type="submit" class="movement-primary-btn">
+                                Save Movement
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        </section>
+    </template>
+
+    <script src="jscript/layout.js"></script>
+    <script src="jscript/movement.js"></script>
+</body>
+</html>
